@@ -12,10 +12,13 @@
         name: "{{database_name}}"
         state: present
     
-    #TODO fix privelges 
+
     - name: create mysql user and grant privliges on database
       mysql_user:
         login_password: "{{root_password}}" 
-        name: "{{database_user}}@localhost"
+        name: "{{database_user}}"
         password: "{{database_password}}"
-        priv: '"*.*:ALL,GRANT'
+        update_password: always
+        priv: '*.*:ALL'
+        state: present
+    
