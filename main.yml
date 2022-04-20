@@ -1,0 +1,21 @@
+---
+
+- name: Python
+  import_playbook: packages/python-setup.yml
+
+- name: Mysql Install
+  import_playbook: mysql/install-mysql.yml
+  
+- name: Secure Mysql
+  import_playbook: mysql/configure-secure-mysql.yml
+
+- name: Configure MySQl Database for app
+  import_playbook: mysql/configure-app-database.yml
+  
+- name: Configure and install packages for python env
+  import_playbook: packages/python-setup-virtualenv.yml
+  
+- name: Django and webserver setups
+  import_playbook: django/django-setup.yml
+
+

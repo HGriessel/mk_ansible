@@ -1,0 +1,21 @@
+---
+
+- name: configure database for app
+  hosts: all
+  become: true
+  tasks:    
+    
+    - name: create database
+      mysql_db:
+        login_user: root
+        login_password: "{{root_password}}" 
+        name: "{{database_name}}"
+        state: present
+    
+    #TODO fix privelges 
+    - name: create mysql user and grant privliges on database
+      mysql_user:
+        login_password: "{{root_password}}" 
+        name: "{{database_user}}@localhost"
+        password: "{{database_password}}"
+        priv: '"*.*:ALL,GRANT'
