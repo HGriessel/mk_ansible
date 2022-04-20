@@ -1,4 +1,4 @@
-# Mikenskiet
+# Mikenskiet Configuration
 
 ## Configurtion
 
