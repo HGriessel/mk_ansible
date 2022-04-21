@@ -19,7 +19,7 @@ Global Vars that can be set example file provided all.example
 **system_path**: /etc/systemd/system
 **server_name**: app.domain.com
 
-#### Password variable retrieved from 
+#### Password variables retrieved from 
 **database_password**: {{ vault_database_password }}  
 **root_password**: {{ vault_root_password }}  
 
