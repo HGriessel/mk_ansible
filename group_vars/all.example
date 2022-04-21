@@ -1,13 +1,14 @@
-database_user: mikenskiet_db_user
-database_password: 1eenT0Ttien10@S3c!
-database_name: mikenskiet_db
-root_password: TienT0T3lf
-app_root_directory: /var/www/html/mikenskiet
+database_user: db_user
+database_name: db_name
+app_root_directory: /path/to/app_name
 virtualenv_name: mikenskietenv
-static_dir:  /var/www/html/mikenskiet/static
-app_name: mikenskietapp
+static_dir:  /path/to/static
+app_name: app_name
 
 nginx_path: /etc/nginx/conf.d/
 
 system_path: /etc/systemd/system
 server_name: mem.griessels.site
+
+database_password: "{{vault_database_password}}"
+root_password: "{{vault_root_password}}""
