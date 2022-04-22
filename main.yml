@@ -1,5 +1,4 @@
 ---
-
 - name: Python
   import_playbook: packages/python-setup.yml
 
@@ -14,8 +13,10 @@
   
 - name: Configure and install packages for python env
   import_playbook: packages/python-setup-virtualenv.yml
-  
+
 - name: Django and webserver setups
   import_playbook: django/django-setup.yml
 
+- name: installation and configuration of lets encrypt and django
+  import_playbook: letsencrypt/generatecert.yml
 

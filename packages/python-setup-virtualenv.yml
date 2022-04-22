@@ -44,4 +44,19 @@
       pip:
           requirements: "{{app_root_directory}}/requirements.txt"
           virtualenv: "{{app_root_directory}}/{{virtualenv_name}}"
+    
+    - name: "check that provisioning script exist"
+      stat:
+        path: "{{app_root_directory}}/tr069server/scripts/provisioner.py"
+      register: provisioning_script 
+
+    - name: "run provisioning script every 5 minutes"
+      cron:
+        name: "Provisioning device"
+        minute: "*/5"
+        state: present
+        hour: "*"
+        day: "*"
+        job: "{{app_root_directory}}/{{virtualenv_name}}/bin/python3 {{app_root_directory}}/tr069server/scripts/provisioner.py"
+      when: provisioning_script.stat.exists == True
           
