@@ -1,6 +1,6 @@
 ---
 
-- name: installation and configuration of virtualenv and django
+- name: installation and nginx configuration of lets encrypt certificate
   hosts: all
   become: true
 
