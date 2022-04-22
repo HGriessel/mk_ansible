@@ -18,6 +18,7 @@ Global Vars that can be set example file provided all.example
 **nginx_path**: /etc/nginx/conf.d/  
 **system_path**: /etc/systemd/system
 **server_name**: app.domain.com
+**letsencrypt_email** : some@mail.com
 
 #### Password variables retrieved from 
 **database_password**: {{ vault_database_password }}  
