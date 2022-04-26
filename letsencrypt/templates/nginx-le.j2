@@ -27,6 +27,6 @@ server {
     ssl_prefer_server_ciphers on;
     
     location / {
-        rewrite ^ https://www.{{ server_name }}$request_uri? permanent;
+        rewrite ^ https://{{ server_name }}$request_uri? permanent;
     }
 }

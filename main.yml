@@ -1,22 +1,39 @@
 ---
 - name: Python
   import_playbook: packages/python-setup.yml
+  tags:
+    - python
 
 - name: Mysql Install
   import_playbook: mysql/install-mysql.yml
+  tags:
+    - mysql
+ 
   
 - name: Secure Mysql
   import_playbook: mysql/configure-secure-mysql.yml
+  tags:
+    - mysql
+    - mysql_config
 
 - name: Configure MySQl Database for app
   import_playbook: mysql/configure-app-database.yml
+  tags:
+    - mysql
+    - mysqlConfig
   
-- name: Configure and install packages for python env
+- name: Configure and install application
   import_playbook: packages/python-setup-virtualenv.yml
+  tags:  
+    - app_install_config
 
 - name: Django and webserver setups
   import_playbook: django/django-setup.yml
+  tags:
+    - webserver
+
 
 - name: installation and configuration of lets encrypt and django
   import_playbook: letsencrypt/generatecert.yml
+    - setup_ssl
 
