@@ -1,39 +1,31 @@
 ---
-- name: Python
-  import_playbook: python/python-setup.yml
-  tags:
+
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        state: latest
+        update_cache: yes
+      tags:
+        - always
+
+- hosts: applications
+  become: true
+  roles:
     - python
 
-- name: Mysql Install
-  import_playbook: mysql/install-mysql.yml
-  tags:
-    - mysql
- 
-  
-- name: Secure Mysql
-  import_playbook: mysql/configure-secure-mysql.yml
-  tags:
-    - mysql
-    - mysql_config
+- hosts: databases
+  become: true
+  roles:
+    - database
 
-- name: Configure MySQl Database for app
-  import_playbook: mysql/configure-app-database.yml
-  tags:
-    - mysql
-    - mysqlConfig
-  
-- name: Configure and install application dependencies
-  import_playbook: django/python-setup-virtualenv.yml
-  tags:  
-    - app_install_config
+- hosts: applications
+  become: true
+  roles:  
+    - django
 
-- name: Django and webserver setups
-  import_playbook: django/django-setup.yml
-  tags:
-    - webserver
-
-
-- name: installation and configuration of lets encrypt and django
-  import_playbook: letsencrypt/generatecert.yml
-    - setup_ssl
-
+- hosts: applications
+  become: true
+  roles: 
+    - letsencrypt

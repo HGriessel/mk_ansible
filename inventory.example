@@ -1,2 +1,6 @@
-[hosts]
+
+[applications]
+0.0.0.0
+
+[databases]
 0.0.0.0

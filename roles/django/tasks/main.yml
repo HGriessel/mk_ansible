@@ -21,13 +21,14 @@
     - python_env_setup
 
 
-- name: git clone repository
-  git:
-    repo: git@gitlab.com:Griessmeister/mikenskiet.git
-    dest: "{{app_root_directory}}"
-    clone: yes
-  tags: 
-    - python_env_setup
+# - name: git clone repository
+#   git:
+#     repo: git@github.com:adriaan-firstdmt/mk_henri.git
+#     dest: "{{app_root_directory}}"
+#     clone: yes
+#     update: no
+#   tags: 
+#     - python_env_setup
 
 
 - name: "create virataul env"
@@ -62,6 +63,11 @@
     - python_env_setup
 
 
+- name: create .env file
+  template:
+    src: env.j2
+    dest: "{{app_root_directory}}/.env"
+    
 - name: create static directory
   file:
     path: "{{static_dir}}"
@@ -70,10 +76,10 @@
   tags: 
     - django_project_install
 
-- name: "collectstatic"
-  command: "{{app_root_directory}}/{{virtualenv_name}}/bin/python3 {{app_root_directory}}/manage.py collectstatic"
-  tags: 
-    - django_project_install
+# - name: "collectstatic"
+#   command: "{{app_root_directory}}/{{virtualenv_name}}/bin/python3 {{app_root_directory}}/manage.py collectstatic"
+#   tags: 
+#     - django_project_install
 
 - name: create gunicorn socket file
   template:

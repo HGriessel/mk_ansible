@@ -18,8 +18,8 @@
   template:
     src: templates/nginx-http.j2
     dest: /etc/nginx/sites-enabled/http
-    tags:
-      - ssl_setup
+  tags:
+    - ssl_setup
 
 - name: Reload nginx to activate letsencrypt site
   service: name=nginx state=restarted
@@ -30,22 +30,22 @@
   shell: letsencrypt certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ server_name }}
   args:
     creates: /etc/letsencrypt/live/{{ server_name }}
-    tags:
-      - ssl_setup
+  tags:
+    - ssl_setup
 
 - name: Generate dhparams
   shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
   args:
     creates: /etc/nginx/dhparams.pem
-    tags:
-      - ssl_setup
+  tags:
+    - ssl_setup
 
 - name: Install nginx site for specified site
   template:
     src: templates/nginx-le.j2
     dest: /etc/nginx/sites-enabled/le
-    tags:
-      - ssl_setup
+  tags:
+    - ssl_setup
 
 - name: Reload nginx to activate specified site
   service: name=nginx state=restarted
@@ -57,7 +57,7 @@
     name: letsencrypt_renewal
     special_time: weekly
     job: letsencrypt --renew certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ server_name }} && service nginx reload
-    tags:
-      - ssl_setup
+  tags:
+    - ssl_setup
 
 
