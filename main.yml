@@ -1,6 +1,6 @@
 ---
 - name: Python
-  import_playbook: packages/python-setup.yml
+  import_playbook: python/python-setup.yml
   tags:
     - python
 
@@ -22,8 +22,8 @@
     - mysql
     - mysqlConfig
   
-- name: Configure and install application
-  import_playbook: packages/python-setup-virtualenv.yml
+- name: Configure and install application dependencies
+  import_playbook: django/python-setup-virtualenv.yml
   tags:  
     - app_install_config
 
