@@ -1,0 +1,63 @@
+
+- name: Upgrade system
+  apt: upgrade=dist update_cache=yes
+  tags:
+    - ssl_setup
+
+- name: install letsencrypt
+  apt: name=letsencrypt state=latest
+  tags:
+    - ssl_setup
+
+- name: create letsencrypt directory
+  file: name=/var/www/letsencrypt state=directory
+  tags:
+    - ssl_setup
+
+- name: Install nginx site for letsencrypt requests
+  template:
+    src: templates/nginx-http.j2
+    dest: /etc/nginx/sites-enabled/http
+    tags:
+      - ssl_setup
+
+- name: Reload nginx to activate letsencrypt site
+  service: name=nginx state=restarted
+  tags:
+    - ssl_setup
+
+- name: Create letsencrypt certificate
+  shell: letsencrypt certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ server_name }}
+  args:
+    creates: /etc/letsencrypt/live/{{ server_name }}
+    tags:
+      - ssl_setup
+
+- name: Generate dhparams
+  shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
+  args:
+    creates: /etc/nginx/dhparams.pem
+    tags:
+      - ssl_setup
+
+- name: Install nginx site for specified site
+  template:
+    src: templates/nginx-le.j2
+    dest: /etc/nginx/sites-enabled/le
+    tags:
+      - ssl_setup
+
+- name: Reload nginx to activate specified site
+  service: name=nginx state=restarted
+  tags:
+    - ssl_setup
+
+- name: Add letsencrypt cronjob for cert renewal
+  cron:
+    name: letsencrypt_renewal
+    special_time: weekly
+    job: letsencrypt --renew certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ server_name }} && service nginx reload
+    tags:
+      - ssl_setup
+
+

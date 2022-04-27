@@ -1,0 +1,146 @@
+- name: install git if not installed
+  apt: 
+    name: git
+    state: present
+  tags: 
+    - python_env_setup
+
+
+- name: Install virtual env
+  pip:
+    name: virtualenv
+  tags: 
+    - python_env_setup
+
+
+- name: create app directory
+  file:
+    path: "{{app_root_directory}}"
+    state: directory
+  tags: 
+    - python_env_setup
+
+
+- name: git clone repository
+  git:
+    repo: git@gitlab.com:Griessmeister/mikenskiet.git
+    dest: "{{app_root_directory}}"
+    clone: yes
+  tags: 
+    - python_env_setup
+
+
+- name: "create virataul env"
+  command: 
+    chdir: "{{app_root_directory}}"
+    cmd: virtualenv "{{virtualenv_name}}"
+  tags: 
+    - python_env_setup
+
+
+- name: apt install default-libmysqlclient-dev
+  apt:
+    name: default-libmysqlclient-dev
+    state: present
+  tags: 
+    - python_env_setup
+
+
+- name: install packages for django env
+  pip:
+    virtualenv: "{{app_root_directory}}/{{virtualenv_name}}"
+    name: ["django","gunicorn","mysqlclient"]
+  tags: 
+    - python_env_setup
+
+
+- name: install django_project requirements
+  pip:
+      requirements: "{{app_root_directory}}/requirements.txt"
+      virtualenv: "{{app_root_directory}}/{{virtualenv_name}}"
+  tags: 
+    - python_env_setup
+
+
+- name: create static directory
+  file:
+    path: "{{static_dir}}"
+    state: directory
+    mode: 0755
+  tags: 
+    - django_project_install
+
+- name: "collectstatic"
+  command: "{{app_root_directory}}/{{virtualenv_name}}/bin/python3 {{app_root_directory}}/manage.py collectstatic"
+  tags: 
+    - django_project_install
+
+- name: create gunicorn socket file
+  template:
+    src: gunicorn.socket.j2
+    dest: "{{system_path}}/gunicorn.socket"
+  tags: 
+    - django_project_install
+  
+- name: create gunicorn serviced file
+  template:
+    src: gunicorn.service.j2
+    dest: "{{system_path}}/gunicorn.service"
+  tags: 
+    - django_project_install
+
+- name: set ownership of gunicorn.service file
+  file:
+    path: "{{app_root_directory}}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+  tags: 
+    - django_project_install
+
+- name: reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  tags: 
+    - django_project_install
+
+- name: start and enable gunicorn service
+  service:
+    name: gunicorn.socket
+    state: started
+    enabled: yes
+  tags: 
+    - django_project_install
+ 
+- name: create nginx conf file
+  template:
+    src: nginx.conf.j2
+    dest: "{{nginx_path}}/{{app_name}}.conf"
+  tags: 
+    - django_project_install
+
+- name: restart nginx serivce
+  service:
+    name: nginx
+    state: restarted
+  tags: 
+    - django_project_install
+
+- name: "check that provisioning script exist"
+  stat:
+    path: "{{app_root_directory}}/tr069server/scripts/provisioner.py"
+  register: provisioning_script 
+  tags: 
+    - cron_jobs_setup
+
+- name: "run provisioning script every 5 minutes"
+  cron:
+    name: "Provisioning device"
+    minute: "*/5"
+    state: present
+    hour: "*"
+    day: "*"
+    job: "{{app_root_directory}}/{{virtualenv_name}}/bin/python3 {{app_root_directory}}/tr069server/scripts/provisioner.py"
+  when: provisioning_script.stat.exists == True
+  tags: 
+    - cron_jobs_setup

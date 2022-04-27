@@ -1,0 +1,86 @@
+- name: Install mysql-server and mysql client and dependencies
+  apt:
+    name: "{{item}}"
+    state: present
+  loop: 
+    - default-mysql-server
+    - default-mysql-client
+    - python3-mysqldb
+  tags: 
+    - db_install
+
+- name: start and enable the mysql service
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  tags: 
+    - db_install
+
+
+
+- name: Set root user password for database
+  mysql_user: 
+    name: root 
+    password: "{{root_password}}"
+    login_user: root
+    login_password: "{{root_password}}"
+    login_host: localhost
+    state: present
+  tags:
+    - db_secure
+
+- name: Delete anonymous MySQL user
+  mysql_user:
+    login_user: root
+    login_password: "{{root_password}}"
+    name: "" 
+    host: "{{item}} "
+    state: absent
+  with_items:
+    - localhost
+    - "{{ansible_nodename}}"
+  tags:
+    - db_secure
+
+- name: Delete Hostname based MySQL user
+  mysql_user:
+    login_user: root
+    login_password: "{{root_password}}"
+    name: root 
+    host: "{{ansible_nodename}}" 
+    state: absent
+  tags:
+    - db_secure
+  
+- name: Remove MySQL test database
+  mysql_db:
+    login_user: root
+    login_password: "{{root_password}}" 
+    name: test 
+    state: absent
+  tags:
+    - db_secure
+
+
+- name: create database
+  mysql_db:
+    login_user: root
+    login_password: "{{root_password}}" 
+    name: "{{database_name}}"
+    state: present
+  tags:
+    - create_app_db
+
+
+- name: create mysql user and grant privliges on database
+  mysql_user:
+    login_password: "{{root_password}}" 
+    name: "{{database_user}}"
+    password: "{{database_password}}"
+    update_password: always
+    priv: '*.*:ALL'
+    state: present
+  tags:
+    - create_app_db
+    
